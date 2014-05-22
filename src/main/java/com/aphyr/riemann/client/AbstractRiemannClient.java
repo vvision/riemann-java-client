@@ -53,7 +53,7 @@ public abstract class AbstractRiemannClient implements DualTransport {
   }
 
   public IPromise<Boolean> aSendEventsWithAck(final List<Event> events) {
-    final IPromise<Msg> p = aSendRecvMessage(
+    final IPromise<Msg> p = aSendMaybeRecvMessage(
         Msg.newBuilder()
         .addAllEvents(events)
         .build());

@@ -53,7 +53,7 @@ public abstract class AbstractRiemannClient implements DualTransport {
   }
 
   public IPromise<Boolean> aSendEventsWithAck(final List<Event> events) {
-    final IPromise<Msg> p = aSendMaybeRecvMessage(
+    final IPromise<Msg> p = aSendRecvMessage(
         Msg.newBuilder()
         .addAllEvents(events)
         .build());
@@ -107,6 +107,36 @@ public abstract class AbstractRiemannClient implements DualTransport {
   // swallows all exceptions silently. No guarantees on delivery.
   public void sendEvents(final Event... events) {
     sendEvents(Arrays.asList(events));
+  }
+
+  public IPromise<Boolean> aSendEvents(final List<Event> events) {
+    final IPromise<Msg> p = aSendMaybeRecvMessage(
+      Msg.newBuilder()
+      .addAllEvents(events)
+      .build());
+
+    return new IPromise<Boolean>() {
+      public void deliver(Object value) { }
+      public Boolean deref() throws IOException {
+        validate(p.deref());
+        return true;
+      }
+      public Boolean deref(long time, TimeUnit unit) throws IOException {
+        validate(p.deref(time, unit));
+        return true;
+      }
+      public Boolean deref(long time, TimeUnit unit, Boolean timeoutValue) throws IOException {
+        if (null != validate(p.deref(time, unit, null))) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    };
+  }
+
+  public IPromise<Boolean> aSendEvents(final Event... events) {
+    return aSendEvents(Arrays.asList(events));
   }
 
   // Send an Exception event, with state "error" and tagged

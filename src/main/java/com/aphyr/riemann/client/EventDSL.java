@@ -176,4 +176,12 @@ public class EventDSL {
     public IPromise send() {
       return client.aSendEventsWithAck(build());
     }
+
+    public void sendEvents() {
+      client.sendEvents(build());
+    }
+
+    public IPromise aSendEvents() {
+      return client.aSendEvents(build());
+    }
 }
